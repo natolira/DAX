@@ -1,7 +1,7 @@
 ﻿= 
 --CALCULATE application and evaluation order of filters
 --Created by Renato Lira
---version of 2022-01-10 (presented at SQLBits 2023)
+--version of 2023-03-11 (presented at SQLBits 2023) (first draft on 2022-01-10)
 --The generic CALCULATE expression:
 
 CALCULATE ( 
@@ -28,15 +28,17 @@ RETURN
 CALCULATE(
 	CALCULATE(
 		CALCULATE(
-			CALCULATE ( 
-				[Measure], 				-- Application: 6) Last step is the evaluation of the measure 
-										-- (Expression can be changed if a calc item is among the filters)
-				CROSSFILTER(...),		-- Application: 5) Model changes are reflected at POWER Matrix
-				USERELATIONSHIP(...)	-- Application: 5) Model changes are reflected at POWER Matrix
+			CALCULATE(
+				CALCULATE ( 
+					[Measure], 				-- Application: 6) Last step is the evaluation of the measure 
+											-- (Expression can be changed if a calc item is among the filters)
+					CROSSFILTER(...),		-- Application: 5) Model changes are reflected at POWER Matrix
+					USERELATIONSHIP(...)	-- Application: 5) Model changes are reflected at POWER Matrix
 				),
-			KEEPFILTERS(T3),			-- Application: 3) Transparent filters (KEEPFILTERS) are applied
-			T1,                			-- Application: 4) Conventional filters are applied
-			T2							-- Application: 4) Conventional filters are applied
+				KEEPFILTERS(T3)			-- Application: 4) Transparent filters (KEEPFILTERS) are applied
+			),
+			T1,                			-- Application: 3) Conventional filters are applied
+			T2							-- Application: 3) Conventional filters are applied
 		),
 		ALL(Tn)							-- Application: 2) Filters are removed from the lineage (according to POWER Matrix)
 	),
