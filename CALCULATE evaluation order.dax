@@ -17,10 +17,10 @@ CALCULATE (
 -- Can be rewritten as:
 ------------------------
 
-VAR T0 = T        -- Avaliation: 0) Context transition from row context (if row context is active)
-VAR T1 = F1       -- Avaliation: 0) Table from F1 is evaluated
-VAR T2 = F2       -- Avaliation: 0) Table from F2 is evaluated
-VAR T3 = F3       -- Avaliation: 0) Table from F3 is evaluated
+VAR T0 = T        -- Evaluation: 0) Context transition from row context 	
+VAR T1 = F1       -- Evaluation: 0) Table from F1 is evaluated
+VAR T2 = F2       -- Evaluation: 0) Table from F2 is evaluated
+VAR T3 = F3       -- Evaluation: 0) Table from F3 is evaluated
 
 -- After the evaluation of the table filters they are applied:
 
@@ -31,16 +31,16 @@ CALCULATE(
 			CALCULATE(
 				CALCULATE ( 
 					[Measure], 				-- Application: 6) Last step is the evaluation of the measure 
-											-- (Expression can be changed if a calc item is among the filters)
+											-- (Expression may be changed if a calc item is among the filters)
 					CROSSFILTER(...),		-- Application: 5) Model changes are reflected at POWER Matrix
 					USERELATIONSHIP(...)	-- Application: 5) Model changes are reflected at POWER Matrix
 				),
 				KEEPFILTERS(T3)			-- Application: 4) Transparent filters (KEEPFILTERS) are applied
 			),
-			T1,                			-- Application: 3) Conventional filters are applied
-			T2							-- Application: 3) Conventional filters are applied
+			T1,                			-- Application: 3) Blocking filters are applied
+			T2							-- Application: 3) Blocking filters are applied
 		),
 		ALL(Tn)							-- Application: 2) Filters are removed from the lineage (according to POWER Matrix)
 	),
-	T0									-- Application: 1) Context transition filter is applied
+	T0									-- Application: 1) Context transition filter is applied (if row context is active)
 )
