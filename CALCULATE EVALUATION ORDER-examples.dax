@@ -1,0 +1,176 @@
+﻿-- Connect this using DAX Editor to a AdventureWorks 2020 PBIX
+-- link: https://github.com/microsoft/powerbi-desktop-samples/blob/main/DAX/Adventure%20Works%20DW%202020.pbix
+
+
+-- 01
+-- without context transition, expressions are evaluated over 
+-- the current filter contex
+--
+
+EVALUATE
+SELECTCOLUMNS (
+    Sales,
+    "Measure",
+        COUNTROWS ( 'Date' )
+)
+
+-- 02
+-- context transition happens over the expanded table
+--
+
+EVALUATE
+SELECTCOLUMNS (
+    Sales,
+    "Measure",
+        CALCULATE ( COUNTROWS ( 'Date' ) )
+)
+
+-- 03
+-- Best practice is to be selective over the group by columns
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE ( COUNTROWS ( 'Date' ) )
+)
+
+-- 04
+-- You can block context transition effect
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            ALL ( 'Date'[Fiscal Year] )
+        )
+)
+
+-- 05
+-- You can override context transition
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            'Date'[Fiscal Year] = "FY2020"
+        )
+)
+
+-- 06
+-- You can restore external filter contexts
+--
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    TREATAS ( { "FY2019", "FY2020" }, 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            ALLSELECTED ( 'Date'[Fiscal Year] )
+        )
+)
+
+-- 07
+-- You can override a restored filter contexts
+--
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    TREATAS ( { "FY2018", "FY2019" }, 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            ALLSELECTED ( 'Date'[Fiscal Year] ),
+            'Date'[Fiscal Year] = "FY2020"
+        )
+)
+
+-- 08
+-- Two filters have the same weight
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            'Date'[Fiscal Year] IN { "FY2018", "FY2019" },
+            'Date'[Fiscal Year] IN { "FY2019", "FY2020" }
+        )
+)
+
+-- 09
+-- KEEPFILTERS do not block previous filters
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            KEEPFILTERS ( 'Date'[Fiscal Year] IN { "FY2018", "FY2019" } )
+        )
+)
+
+-- 10
+-- KEEPFILTERS do not block previous filters2
+--
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            CALCULATE (
+                COUNTROWS ( 'Date' ),
+                KEEPFILTERS ( 'Date'[Fiscal Year] IN { "FY2018", "FY2019" } )
+            ),
+            'Date'[Fiscal Year] IN { "FY2019", "FY2020" }
+        )
+)
+
+
+-- 11
+-- Model Modifiers only act after filters are evaluated
+-- under the current model
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            COUNTROWS ( 'Date' ),
+            CROSSFILTER ( 'Date'[DateKey], Sales[OrderDateKey], NONE ),
+            REMOVEFILTERS ( Sales ) -- with relationship version
+        )
+)
+
+-- 12
+-- Model Modifiers only act after filters are evaluated
+-- under the current model2
+--
+
+EVALUATE
+ADDCOLUMNS (
+    ALL ( 'Date'[Fiscal Year] ),
+    "Measure",
+        CALCULATE (
+            CALCULATE (
+                COUNTROWS ( 'Date' ),
+                REMOVEFILTERS ( Sales ) -- without relationship version
+            ),
+            CROSSFILTER ( 'Date'[DateKey], Sales[OrderDateKey], NONE )
+        )
+)
