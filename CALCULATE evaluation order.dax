@@ -1,7 +1,7 @@
 ﻿= 
 --CALCULATE application and evaluation order of filters
 --Created by Renato Lira
---version of 2023-03-11 (presented at SQLBits 2023) (first draft on 2022-01-10)
+--version of 2023-03-11 (presented at SQLBits 2023 and PASS 2023) (first draft on 2022-01-10)
 --The generic CALCULATE expression:
 
 CALCULATE ( 
@@ -17,7 +17,7 @@ CALCULATE (
 -- Can be rewritten as:
 ------------------------
 
-VAR T0 = T        -- Evaluation: 0) Context transition from row context 	
+VAR T0 = T        -- Evaluation: 0) Context transition from row context (if active)	
 VAR T1 = F1       -- Evaluation: 0) Table from F1 is evaluated
 VAR T2 = F2       -- Evaluation: 0) Table from F2 is evaluated
 VAR T3 = F3       -- Evaluation: 0) Table from F3 is evaluated
