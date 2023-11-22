@@ -1,4 +1,4 @@
-﻿-- Connect this using DAX Editor to a AdventureWorks 2020 PBIX
+﻿-- Connect this using DAX Studio (or DAX Query view) to a AdventureWorks 2020 PBIX
 -- link: https://github.com/microsoft/powerbi-desktop-samples/blob/main/DAX/Adventure%20Works%20DW%202020.pbix
 
 
